@@ -139,6 +139,21 @@ impl coap_handler::Handler for FileServer {
                     return;
                 };
 
+                // FIXME: Find something better than cap_std that has API that only walks single
+                // items at a time. (After all, how can we be sure that / and \ are exhaustive
+                // platform path separators?).
+                if seg.contains('/') || seg.contains('\\') {
+                    // We generally rely on cap_std to restrict us according to the server's
+                    // settings; however, in corner cases (e.g. when an access policy deviates from
+                    // best practices and uses a denylist for paths), variability from accepting
+                    // encoded slashes would be detrimental.
+                    log::error!(
+                        "Segment contains slashes. While this is allowed in CoAP, even cap_std "
+                    );
+                    path = Err(Error::not_found());
+                    return;
+                }
+
                 if let Some(prev_segment) = next_segment.take() {
                     log::debug!("Traversing into directory {:?}", prev_segment);
                     path = base_path.open_dir(prev_segment).map_err(errmap)
