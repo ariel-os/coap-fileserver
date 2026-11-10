@@ -1,7 +1,11 @@
 [package]
 name = "coap-fileserver"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2024"
+repository = "https://github.com/ariel-os/coap-fileserver"
+license = "MIT OR Apache-2.0"
+keywords = ["coap", "iot"]
+categories = ["network-programming", "web-programming"]
 
 [dependencies]
 cap-std = "4.0.3"

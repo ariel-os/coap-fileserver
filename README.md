@@ -1,4 +1,4 @@
-# coap-fileserver ![License](https://img.shields.io/crates/l/coap-fileserver) [![coap-fileserver on crates.io](https://img.shields.io/crates/v/coap-fileserver)](https://crates.io/crates/coap-fileserver)
+# coap-fileserver ![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue) [![coap-fileserver on crates.io](https://img.shields.io/crates/v/coap-fileserver)](https://crates.io/crates/coap-fileserver) [![Source Code Repository](https://img.shields.io/badge/Code-On%20GitHub-blue?logo=GitHub)](https://github.com/ariel-os/coap-fileserver)
 
 ## coap-fileserver: A simple CoAP file server
 
