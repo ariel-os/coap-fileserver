@@ -10,14 +10,16 @@ use coap_message_utils::{
 use std::io::{Read as _, Seek as _, SeekFrom};
 
 fn errmap(e: std::io::Error) -> Error {
-    match e.kind() {
+    let converted = match e.kind() {
         std::io::ErrorKind::NotFound => Error::not_found(),
         std::io::ErrorKind::PermissionDenied => Error::unauthorized(),
         std::io::ErrorKind::NotADirectory => Error::bad_request().with_title("not a directory"),
         std::io::ErrorKind::IsADirectory => Error::bad_request().with_title("is a directory"),
         // std::io::ErrorKind::NotSeekable => … might need actra handling
         _ => Error::internal_server_error(), // or bad request, hard to find a good splitting point here
-    }
+    };
+    log::error!("Serving IO error {:?} as {:?}", e, converted);
+    converted
 }
 
 fn file_etag(_file: &cap_std::fs::File, metadata: &cap_std::fs::Metadata) -> Result<ETag, Error> {
@@ -138,6 +140,7 @@ impl coap_handler::Handler for FileServer {
                 };
 
                 if let Some(prev_segment) = next_segment.take() {
+                    log::debug!("Traversing into directory {:?}", prev_segment);
                     path = base_path.open_dir(prev_segment).map_err(errmap)
                 }
 
@@ -161,6 +164,7 @@ impl coap_handler::Handler for FileServer {
 
         let entity = match next_segment {
             Some(filename) if filename != "" => {
+                log::debug!("Opening file {:?}", filename);
                 FileOrDir::File(path.open(filename).map_err(errmap)?)
             }
             _ => FileOrDir::Dir(path),
@@ -204,6 +208,8 @@ impl coap_handler::Handler for FileServer {
                     } else {
                         Some(block2)
                     };
+
+                    log::info!("Serving file {:?} (from {} to {})", file, start, length);
 
                     Ok(Outcome::RenderFile {
                         file: file,

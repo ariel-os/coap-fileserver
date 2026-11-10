@@ -16,8 +16,5 @@ Run as
 
 ```console
 $ cargo install --path .
-$ coap-fileserver .
+$ coap-fileserver --verbose .
 ```
-
-(At the time of writing, the *only* directory that can be served is the working directory;
-this will change as arguments are being added).

@@ -16,28 +16,48 @@
 //!
 //! ```console
 //! $ cargo install --path .
-//! $ coap-fileserver .
+//! $ coap-fileserver --verbose .
 //! ```
-//!
-//! (At the time of writing, the *only* directory that can be served is the working directory;
-//! this will change as arguments are being added).
 
 mod fileserver;
 
-#[tokio::main]
-async fn main() {
-    let mut stack = std_embedded_nal_async::Stack::default();
+use std::path::{Path, PathBuf};
 
-    run_fileserver(&mut stack).await;
+#[derive(Debug, clap::Parser)]
+#[command(version)]
+struct Options {
+    /// Path to serve as root path.
+    pub path: PathBuf,
+
+    #[command(flatten)]
+    pub verbose: clap_verbosity_flag::Verbosity<clap_verbosity_flag::WarnLevel>,
 }
 
-async fn run_fileserver(stack: &mut impl embedded_nal_async::UdpStack) {
+#[tokio::main]
+async fn main() {
+    use clap::Parser;
+    let options = Options::parse();
+
+    let loglevel = options.verbose.log_level().unwrap_or(log::Level::Error);
+    pretty_env_logger::formatted_builder()
+        .filter(None, loglevel.to_level_filter())
+        .try_init()
+        .expect("There is only one logger setup");
+
+    log::debug!("Verbosity set to {}", loglevel);
+
+    let mut stack = std_embedded_nal_async::Stack::default();
+
+    run_fileserver(&mut stack, &options.path).await;
+}
+
+async fn run_fileserver(stack: &mut impl embedded_nal_async::UdpStack, path: &Path) {
     let mut sock = stack
         .bind_multiple(core::net::SocketAddr::new("::".parse().unwrap(), 5683))
         .await
         .expect("Can't create a socket");
 
-    let mut handler = fileserver_handler();
+    let mut handler = fileserver_handler(path);
 
     let coap = embedded_nal_coap::CoAPShared::<3>::new();
     let (_client, server) = coap.split();
@@ -48,8 +68,8 @@ async fn run_fileserver(stack: &mut impl embedded_nal_async::UdpStack) {
         .expect("UDP error")
 }
 
-fn fileserver_handler() -> impl coap_handler::Handler {
+fn fileserver_handler(path: &Path) -> impl coap_handler::Handler {
     fileserver::FileServer::new(cap_std::fs::Dir::from_std_file(
-        std::fs::File::open(".").unwrap(),
+        std::fs::File::open(path).unwrap(),
     ))
 }
