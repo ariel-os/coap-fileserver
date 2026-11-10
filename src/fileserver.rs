@@ -96,8 +96,10 @@ pub enum Outcome {
         etag: ETag,
     },
     RenderIndex {
+        // Not calculating an ETag here: we're letting the writer-with-etag handle this. (That
+        // implicitly makes sure we're covering the right data in it).
         dir: cap_std::fs::Dir,
-        etag: ETag,
+        block2: Block2RequestData,
     },
 }
 
@@ -235,7 +237,7 @@ impl coap_handler::Handler for FileServer {
                     })
                 }
             }
-            FileOrDir::Dir(dir) => todo!("read dir metadata {:?}", dir.dir_metadata()),
+            FileOrDir::Dir(dir) => Ok(Outcome::RenderIndex { dir, block2 }),
         }
     }
 
@@ -288,7 +290,32 @@ impl coap_handler::Handler for FileServer {
                     Ok(())
                 }
             }
-            Outcome::RenderIndex { dir, etag } => todo!(),
+            Outcome::RenderIndex { dir, block2 } => {
+                response.set_code(M::Code::new(coap_numbers::code::CONTENT)?);
+
+                let result = coap_handler_implementations::helpers::block2_write(
+                    block2,
+                    response,
+                    |w| -> Result<(), std::io::Error> {
+                        use core::fmt::Write;
+
+                        writeln!(w, "Index:").unwrap();
+                        for e in dir.entries()? {
+                            writeln!(w, "{:?}", e?.file_name()).unwrap();
+                        }
+
+                        Ok(())
+                    },
+                );
+
+                if result.is_err() {
+                    // FIXME: Rewind options? (Should be easier with next Message version)
+                    response.set_code(M::Code::new(coap_numbers::code::INTERNAL_SERVER_ERROR)?);
+                    response.truncate(0)?;
+                }
+
+                Ok(())
+            }
         }
     }
 }

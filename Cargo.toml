@@ -13,6 +13,7 @@ cap-std = "4.0.3"
 clap = { version ="4", features = [ "derive" ] }
 clap-verbosity-flag = "3"
 coap-handler = "0.2.1"
+coap-handler-implementations = "0.6.4"
 coap-message = "0.3.7"
 coap-message-utils = { version = "0.3.12", features = ["error_unprocessed_coap_option", "error_title"] }
 coap-numbers = "0.2.11"

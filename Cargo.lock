@@ -431,6 +431,7 @@ dependencies = [
  "clap",
  "clap-verbosity-flag",
  "coap-handler",
+ "coap-handler-implementations",
  "coap-message",
  "coap-message-utils",
  "coap-numbers",
@@ -453,6 +454,27 @@ checksum = "503c04616163d1b4912e3e780d60d1defbe483e62e953dd9ebe74a3644ab4b96"
 dependencies = [
  "coap-message",
  "coap-numbers",
+]
+
+[[package]]
+name = "coap-handler-implementations"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e235b2a3bf23d555af6049695ca47ee0e373a4d0942c14da5e97b89d6440edb5"
+dependencies = [
+ "coap-handler",
+ "coap-message",
+ "coap-message-utils",
+ "coap-numbers",
+ "crc",
+ "document-features",
+ "embedded-io 0.7.1",
+ "embedded-io-adapters",
+ "extra-embedded-io-adapters",
+ "minicbor",
+ "minicbor-adapters",
+ "tee-embedded-io",
+ "windowed-infinity",
 ]
 
 [[package]]
@@ -753,6 +775,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9eb1aa714776b75c7e67e1da744b81a129b3ff919c8712b5e1b32252c1f07cc7"
 
 [[package]]
+name = "embedded-io-adapters"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c900a1c087f1f7d17cdc84a1290df91521cd90933efa76d68e568385d889f2f4"
+dependencies = [
+ "embedded-io 0.7.1",
+]
+
+[[package]]
 name = "embedded-io-async"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -854,6 +885,17 @@ checksum = "8be9f3dfaaffdae2972880079a491a1a8bb7cbed0b8dd7a347f668b4150a3b93"
 dependencies = [
  "event-listener",
  "pin-project-lite",
+]
+
+[[package]]
+name = "extra-embedded-io-adapters"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41b7942b8008547a00ed47550218a6d56314c9984b8ab969db62ecb87fbc13ff"
+dependencies = [
+ "crc",
+ "digest",
+ "embedded-io 0.7.1",
 ]
 
 [[package]]
@@ -1781,6 +1823,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tee-embedded-io"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4040e9295b6bc2865a3e0c07c98ab4a2261a6321d5eab16466ccce984f540c3"
+dependencies = [
+ "embedded-io 0.7.1",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1932,6 +1983,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "windowed-infinity"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b6aad0911b4b6516712a138831af937bfef95015f649c9877d8ba84707a72ec4"
+dependencies = [
+ "embedded-io 0.7.1",
 ]
 
 [[package]]
