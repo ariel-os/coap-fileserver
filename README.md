@@ -18,3 +18,16 @@ Run as
 $ cargo install --path .
 $ coap-fileserver --verbose .
 ```
+
+### Relevant specifications
+
+This runs a server as specified in [RFC7252][__link0],
+including block-wise transfer specified in [RFC7959][__link1].
+
+The file system operations follow [the file system sketch in the kitchensink
+draft][__link2].
+
+
+ [__link0]: https://www.rfc-editor.org/info/rfc7252/
+ [__link1]: https://www.rfc-editor.org/info/rfc7959/
+ [__link2]: https://www.ietf.org/archive/id/draft-amsuess-core-coap-kitchensink-06.html#coap-filesystem
