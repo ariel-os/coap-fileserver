@@ -78,7 +78,7 @@ async fn run_fileserver(stack: &mut impl embedded_nal_async::UdpStack, path: &Pa
 }
 
 fn fileserver_handler(path: &Path) -> impl coap_handler::Handler {
-    fileserver::FileServer::new(cap_std::fs::Dir::from_std_file(
+    fileserver::FileServer::new(cap_std::fs_utf8::Dir::from_std_file(
         std::fs::File::open(path).unwrap(),
     ))
 }

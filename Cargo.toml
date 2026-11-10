@@ -9,7 +9,7 @@ categories = ["network-programming", "web-programming"]
 description = "A simple CoAP file server"
 
 [dependencies]
-cap-std = "4.0.3"
+cap-std = { version = "4.0.3", features = ["fs_utf8"] }
 clap = { version ="4", features = [ "derive" ] }
 clap-verbosity-flag = "3"
 coap-handler = "0.2.1"

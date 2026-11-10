@@ -7,6 +7,8 @@ use coap_message_utils::{
     option_value::{Block2RequestData, Block2ResponseData},
 };
 
+use cap_std::fs_utf8::{File, Metadata, Dir};
+
 use std::io::{Read as _, Seek as _, SeekFrom};
 
 fn errmap(e: std::io::Error) -> Error {
@@ -22,7 +24,7 @@ fn errmap(e: std::io::Error) -> Error {
     converted
 }
 
-fn file_etag(_file: &cap_std::fs::File, metadata: &cap_std::fs::Metadata) -> Result<ETag, Error> {
+fn file_etag(_file: &File, metadata: &Metadata) -> Result<ETag, Error> {
     if metadata.file_type().is_dir() {
         return Err(Error::bad_request().with_title("is a directory"));
     }
@@ -62,11 +64,11 @@ fn feed_digest_with_hash(etag: &mut crc::Digest<'_, u64>, hash_this: impl std::h
 }
 
 pub struct FileServer {
-    base: cap_std::fs::Dir,
+    base: Dir,
 }
 
 impl FileServer {
-    pub fn new(base: cap_std::fs::Dir) -> Self {
+    pub fn new(base: Dir) -> Self {
         Self { base }
     }
 }
@@ -75,14 +77,14 @@ type ETag = [u8; 8];
 
 #[derive(Debug)]
 enum FileOrDir {
-    File(cap_std::fs::File),
-    Dir(cap_std::fs::Dir),
+    File(File),
+    Dir(Dir),
 }
 
 pub enum Outcome {
     RenderFile {
         /// The file to serve, already pre-seeked.
-        file: cap_std::fs::File,
+        file: File,
         /// The pre-calculated length we will send. If that can not be read, an internal server
         /// error is to be raised. (We could also read on demand, but we committed to a size2 already
         /// anyway, and to an etag that incoprorates this length, so if a truncation happens right
@@ -98,7 +100,7 @@ pub enum Outcome {
     RenderIndex {
         // Not calculating an ETag here: we're letting the writer-with-etag handle this. (That
         // implicitly makes sure we're covering the right data in it).
-        dir: cap_std::fs::Dir,
+        dir: Dir,
         block2: Block2RequestData,
     },
 }
@@ -301,7 +303,7 @@ impl coap_handler::Handler for FileServer {
 
                         writeln!(w, "Index:").unwrap();
                         for e in dir.entries()? {
-                            writeln!(w, "{:?}", e?.file_name()).unwrap();
+                            writeln!(w, "{}", e?.file_name()?).unwrap();
                         }
 
                         Ok(())
